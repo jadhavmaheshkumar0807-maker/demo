@@ -1,0 +1,16 @@
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: mahesh-svc
+  labels:
+    app: mahesh-app
+    env: qa
+spec:
+  type: {{ .Values.type }}
+  ports:
+    - port: {{ .Values.service.port }}
+      targetPort: {{ .Values.service.port }}
+      protocol: TCP
+  selector:
+    app: mahesh-app

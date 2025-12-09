@@ -1,0 +1,23 @@
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: mahesh-ingress
+  annotations:
+    nginx.ingress.kubernetes.io/rewrite-target: /
+spec:
+  ingressClassName: nginx
+  tls:
+    - hosts: 
+        - 
+  rules:
+    - host: ""
+      http:
+        paths:
+        - backend:
+            service:
+              name: mahesh
+              port:
+                number: 5430
+          pathType: Prefix
+          path: /

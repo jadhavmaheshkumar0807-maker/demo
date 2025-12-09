@@ -1,0 +1,23 @@
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: mahesh-ingress
+  annotations:
+    nginx.ingress.kubernetes.io/rewrite-target: /
+spec:
+  ingressClassName: nginx
+  tls:
+    - hosts: 
+        - {{ .Values.ingress.hosts }}
+  rules:
+    - host: "{{ .Values.ingress.hosts }}"
+      http:
+        paths:
+        - backend:
+            service:
+              name: {{ .Values.ingress.service.name }}
+              port:
+                number: {{ .Values.service.port }}
+          pathType: Prefix
+          path: /

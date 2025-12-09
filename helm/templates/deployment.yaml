@@ -1,0 +1,44 @@
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: mahesh-app
+  labels:
+    app: nodejs-springboot
+    env: qa
+spec:
+  selector:
+    matchLabels:
+      app: nodejs-springboot
+  replicas: {{ .Values.Deployment.replicaCount }}
+  template:
+    metadata:
+      name: mahesh-pod
+      labels:
+        app: nodejs-springboot
+        env: qa
+  
+    spec:
+      containers:
+        - name: mahesh-cnt
+          image: maheshkumar010/mahesh:{{ .Values.Deployment.imageVersion }}
+          ports:
+            - containerPort: {{ .Values.service.port }}
+          resources:
+            requests:
+              cpu: "300m"
+              memory: "512Mi"
+          livenessProbe:
+            httpGet:
+              path: /
+              port: {{ .Values.service.port }}
+            initialDelaySeconds: 5
+            periodSeconds: 10
+            failureThreshold: 3
+          readinessProbe:
+            httpGet:
+              path: /
+              port: {{ .Values.service.port }}
+            initialDelaySeconds: 5
+            periodSeconds: 10
+            failureThreshold: 3
