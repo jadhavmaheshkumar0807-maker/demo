@@ -7,7 +7,7 @@
   vars:
     eks_cluster_name: "mahesh"
     eks_region: "us-east-1"
-    helm_release_name: "mahesh"
+    helm_release_name: "Mahesh"
     helm_chart_path: "/home/ec2-user/helm/"
     kubeconfig_path: "/home/ec2-user/.kube/config"
 
