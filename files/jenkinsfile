@@ -1,87 +1,92 @@
 pipeline {
     agent any
     
-        stages {
-            stage ('cloning the code form github') {
-                steps {
-                    echo 'Cloning the Github repo'
-                    git branch: 'main', url: 'https://github.com/jadhavmaheshkumar0807-maker/HelmProject.git'
-                }
+    stages {
+        stage('Clone GitHub Repo') {
+            steps {
+                git branch: 'main', url: 'https://github.com/jadhavmaheshkumar0807-maker/demo.git'
             }
-            stage ('scanning the code with sonarqube') {
-                steps {
-                    echo 'Scanning the code for static analysis using SonarQube'
+        }
+
+        stage('Build Artifact with Maven') {
+            steps {
+                sh 'cd mahesh-app && mvn clean package -DskipTests'
+            }
+        }
+
+        stage('SonarQube Scan') {
+            steps {
+                sh '''
+                    cd mahesh-app
+                    mvn sonar:sonar \
+                      -Dsonar.host.url=http://3.238.243.178:9000 \
+                      -Dsonar.login=squ_6461ae01dd3ed131326485ed3981daf6c5990c35
+                '''
+            }
+        }
+
+        stage('Build Docker Image') {
+            steps {
+                sh 'cd mahesh-app && docker build -t maheshkumar010/mahesh:${BUILD_NUMBER} .'
+            }
+        }
+
+        stage('Scan Docker Image') {
+            steps {
+                sh 'trivy image maheshkumar010/mahesh:${BUILD_NUMBER} || true'
+            }
+        }
+
+        stage('Push Docker Image to DockerHub') {
+            steps {
+                withCredentials([string(credentialsId: 'dockerhub', variable: 'DOCKER_PASSWORD')]) {
                     sh '''
-                        cd mahesh-app
-                        mvn sonar:sonar \
-                        -Dsonar.host.url=http://18.233.200.116:9000/ \
-                        -Dsonar.login=squ_ced4dbfe453917e0f04c2fe260bda9583084f5ed
+                        echo "${DOCKER_PASSWORD}" | docker login -u maheshkumar010 --password-stdin
+                        docker push maheshkumar010/mahesh:${BUILD_NUMBER}
                     '''
                 }
             }
-            stage ('building artifact with maven') {
-                steps {
-                    echo "building artifact with maven"
-                    sh 'cd mahesh-app && mvn clean package'
-                }
-            }
-            stage ('building docker image') {
-                steps {
-                    script {
-                        echo 'building Docker image'
-                        sh 'cd files && docker build -t maheshkumar010/mahesh:${BUILD_NUMBER} .'
-                    }
-                }
-            }
-            stage ('scanning the docker image') {
-                steps {
-                    echo 'Scaning the docker image with trivy'
-                    sh 'trivy image maheshkumar010/mahesh:${BUILD_NUMBER}'
-                }
-            }
-            stage ('pushing the image to docker hub') {
-                steps {
-                    script{
-                        withCredentials([string(credentialsId: 'dockerhub', variable: 'dockerhub')]) {
-                            sh 'echo "${dockerhub}" | docker login -u maheshkumar010 --password-stdin'
-                        }
-                        sh 'docker push maheshkumar010/mahesh:${BUILD_NUMBER}'
-                    }
-                }
+        }
 
+        stage('Update Helm Values File') {
+            environment {
+                GIT_USER_NAME = "jadhavmaheshkumar0807-maker"
+                GIT_REPO_NAME = "demo"
             }
-            stage ('updating deployment manifest file') {
-                environment {
-                    GIT_USER_NAME = "jadhavmaheshkumar0807-maker"
-                    GIT_REPO_NAME = "HelmProject"
-                }
-                steps {
-                    withCredentials([string(credentialsId: 'githubtoken', variable: 'githubtoken')]) {
-                        sh '''
-                            git config user.name "Mahesh Kumar"
-                            git config user.email "maheshkumar@gmail.com"
-                            sed -i "s|mahesh:.*|mahesh:${BUILD_NUMBER}|g" helm/Values.yaml
-                            git add .
-                            git commit -m "Updating the image tag with ${BUILD_NUMBER}"
-                            git push https://${githubtoken}@github.com/${GIT_USER_NAME}/${GIT_REPO_NAME}.git HEAD:main
-                        '''
+            steps {
+                withCredentials([string(credentialsId: 'githubtoken', variable: 'GITHUB_TOKEN')]) {
+                    sh '''
+                        git config user.name "Mahesh Kumar"
+                        git config user.email "maheshkumar@gmail.com"
 
-                    }
+                        sed -i 's|imageVersion:.*|imageVersion:${BUILD_NUMBER}|g' helm/values.yaml
+
+
+                        git add .
+                        git commit -m "Updating imageVersion to ${BUILD_NUMBER}" || echo "No changes to commit"
+                        git push https://${GITHUB_TOKEN}@github.com/${GIT_USER_NAME}/${GIT_REPO_NAME}.git HEAD:main
+                    '''
                 }
             }
-            stage ('deploying application in k8s using helm through Ansible') {
-                steps {
-                    script {
-                        ansiblePlaybook(
-                            credentialsId: "ssh",
-                            disableHostKeyChecking: true,
-                            installation: 'ansible',
-                            inventory: '/etc/ansible/inventory',
-                            playbook: 'files/Ansible_helm_playbook.yaml'
+        }
+
+        stage('Deploy to EKS using Helm via Ansible') {
+            steps {
+                withCredentials([[
+                    $class: 'AmazonWebServicesCredentialsBinding',
+                    credentialsId: 'aws-creds'
+                ]]) {
+                    ansiblePlaybook(
+                        credentialsId: "ssh",
+                        disableHostKeyChecking: true,
+                        installation: 'ansible',
+                        inventory: '/etc/ansible/inventory',
+                        playbook: 'files/Ansible_helm_playbook.yaml',
+                        extras: "--extra-vars 'aws_access_key=${AWS_ACCESS_KEY_ID} aws_secret_key=${AWS_SECRET_ACCESS_KEY} build_number=${BUILD_NUMBER}'"
                         )
-                    }
+
                 }
             }
-        
+        }
     }
 }
