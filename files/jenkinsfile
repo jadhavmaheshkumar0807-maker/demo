@@ -60,7 +60,7 @@ pipeline {
                         sh '''
                             git config user.name "Mahesh Kumar"
                             git config user.email "maheshkumar@gmail.com"
-                            sed -i "s|mahesh:.*|mahesh:${BUILD_NUMBER}|g" helm/values.yaml
+                            sed -i "s|mahesh:.*|mahesh:${BUILD_NUMBER}|g" helm/Values.yaml
                             git add .
                             git commit -m "Updating the image tag with ${BUILD_NUMBER}"
                             git push https://${githubtoken}@github.com/${GIT_USER_NAME}/${GIT_REPO_NAME}.git HEAD:main
