@@ -11,20 +11,20 @@
     helm_chart_path: "/home/ec2-user/helm"
     kubeconfig_path: "/home/ec2-user/.kube/config"
 
-    # Temporary for testing — REMOVE THESE and use Jenkins Credentials
-    aws_access_key: "{{ lookup('env','AWS_ACCESS_KEY_ID') }}"
-    aws_secret_key: "{{ lookup('env','AWS_SECRET_ACCESS_KEY') }}"
+    # Values passed securely from Jenkins
+    aws_access_key: "{{ aws_access_key }}"
+    aws_secret_key: "{{ aws_secret_key }}"
 
   tasks:
 
-    - name: Copy Helm chart directory from controller to app server
+    - name: Copy Helm chart from Jenkins controller to app server
       copy:
         src: "{{ playbook_dir }}/../helm"
         dest: /home/ec2-user/helm
         mode: '0755'
       tags: copy
 
-    - name: Ensure AWS CLI can fetch EKS kubeconfig
+    - name: Ensure AWS CLI updates kubeconfig for EKS
       command: >
         aws eks update-kubeconfig
         --region {{ eks_region }}
@@ -36,11 +36,11 @@
         AWS_DEFAULT_REGION: "{{ eks_region }}"
       register: kubeconfig_output
 
-    - name: Show kubeconfig result
+    - name: Show kubeconfig update result
       debug:
         var: kubeconfig_output.stdout
 
-    - name: Verify kubectl connection to EKS
+    - name: Verify kubectl connection to EKS cluster
       command: kubectl --kubeconfig {{ kubeconfig_path }} get nodes
       environment:
         AWS_ACCESS_KEY_ID: "{{ aws_access_key }}"
@@ -48,11 +48,11 @@
         AWS_DEFAULT_REGION: "{{ eks_region }}"
       register: nodes_output
 
-    - name: Show node list
+    - name: Show Kubernetes node list
       debug:
         var: nodes_output.stdout
 
-    - name: Deploy/Upgrade Helm release on EKS
+    - name: Deploy / Upgrade Helm release on EKS
       command: >
         helm upgrade --install {{ helm_release_name }}
         {{ helm_chart_path }}
@@ -63,6 +63,6 @@
         AWS_DEFAULT_REGION: "{{ eks_region }}"
       register: helm_output
 
-    - name: Show helm output
+    - name: Show Helm deployment output
       debug:
         var: helm_output.stdout
