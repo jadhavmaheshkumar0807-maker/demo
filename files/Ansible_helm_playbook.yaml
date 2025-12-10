@@ -20,7 +20,7 @@
     - name: Copy Helm chart from Jenkins controller to app server
       copy:
         src: "{{ playbook_dir }}/../helm"
-        dest: /home/ec2-user/
+        dest: /home/ec2-user/.
         mode: '0644'
       tags: copy
 
