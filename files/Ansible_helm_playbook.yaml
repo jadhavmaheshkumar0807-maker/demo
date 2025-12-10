@@ -10,22 +10,25 @@
     helm_release_name: "mahesh"
     helm_chart_path: "/home/ec2-user/helm"
     kubeconfig_path: "/home/ec2-user/.kube/config"
-    aws_access_key: "AKIAQ2NRQDZCJ2FI3MHL"
-    aws_secret_key: "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"
+
+    # Temporary for testing — REMOVE THESE and use Jenkins Credentials
+    aws_access_key: "{{ lookup('env','AWS_ACCESS_KEY_ID') }}"
+    aws_secret_key: "{{ lookup('env','AWS_SECRET_ACCESS_KEY') }}"
 
   tasks:
 
-    - name: Copy Helm chart directory
+    - name: Copy Helm chart directory from controller to app server
       copy:
         src: "{{ playbook_dir }}/../helm"
         dest: /home/ec2-user/helm
         mode: '0755'
+      tags: copy
 
     - name: Ensure AWS CLI can fetch EKS kubeconfig
       command: >
         aws eks update-kubeconfig
-        --name {{ eks_cluster_name }}
         --region {{ eks_region }}
+        --name {{ eks_cluster_name }}
         --kubeconfig {{ kubeconfig_path }}
       environment:
         AWS_ACCESS_KEY_ID: "{{ aws_access_key }}"
@@ -33,35 +36,33 @@
         AWS_DEFAULT_REGION: "{{ eks_region }}"
       register: kubeconfig_output
 
-    - debug:
+    - name: Show kubeconfig result
+      debug:
         var: kubeconfig_output.stdout
 
     - name: Verify kubectl connection to EKS
       command: kubectl --kubeconfig {{ kubeconfig_path }} get nodes
+      environment:
+        AWS_ACCESS_KEY_ID: "{{ aws_access_key }}"
+        AWS_SECRET_ACCESS_KEY: "{{ aws_secret_key }}"
+        AWS_DEFAULT_REGION: "{{ eks_region }}"
       register: nodes_output
 
-    - debug:
+    - name: Show node list
+      debug:
         var: nodes_output.stdout
-        
-    - name: check if kubeconfig exists on remote host
-      stat:
-        path: /home/ec2-user/.kube/config
-      register: kubeconfig_stat
 
-    - name: copy kubeconfig to target if missing
-      copy: 
-        src: "{{ playbook_dir }}/kubeconfig"
-        dest: /home/ec2-user/.kube/config
-        mode: '0600'
-        owner: ec2-user
-      when: not kubeconfig_stat.stat.exists
-      
-    - name: Deploy or Upgrade Helm release
+    - name: Deploy/Upgrade Helm release on EKS
       command: >
         helm upgrade --install {{ helm_release_name }}
         {{ helm_chart_path }}
         --kubeconfig {{ kubeconfig_path }}
+      environment:
+        AWS_ACCESS_KEY_ID: "{{ aws_access_key }}"
+        AWS_SECRET_ACCESS_KEY: "{{ aws_secret_key }}"
+        AWS_DEFAULT_REGION: "{{ eks_region }}"
       register: helm_output
 
-    - debug:
+    - name: Show helm output
+      debug:
         var: helm_output.stdout
