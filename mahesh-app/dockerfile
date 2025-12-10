@@ -5,6 +5,12 @@ WORKDIR /app
 
 COPY target/*.jar app.jar
 
+RUN chown -R ec2-user:ec2-user /app
+
 EXPOSE 8080
+
+# Switch to non-root user
+USER ec2-user
+
 
 ENTRYPOINT [ "java", "-jar", "app.jar" ]
