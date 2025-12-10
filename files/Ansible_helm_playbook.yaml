@@ -15,7 +15,7 @@
 
     - name: Copy Helm chart directory
       copy:
-        src: "{{ playbook_dir }}/helm"
+        src: "{{ playbook_dir }}/../helm"
         dest: /home/ec2-user/helm
         mode: '0755'
 
