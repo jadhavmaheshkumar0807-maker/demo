@@ -20,8 +20,8 @@
     - name: Copy Helm chart from Jenkins controller to app server
       copy:
         src: "{{ playbook_dir }}/../helm"
-        dest: /home/ec2-user/helm
-        mode: '0755'
+        dest: /home/ec2-user/
+        mode: '0644'
       tags: copy
 
     - name: Ensure AWS CLI updates kubeconfig for EKS
