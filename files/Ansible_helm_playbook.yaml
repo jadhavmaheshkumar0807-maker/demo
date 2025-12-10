@@ -16,7 +16,7 @@
     - name: Copy Helm chart directory
       copy:
         src: "{{ playbook_dir }}/helm"
-        dest: /home/ec2-user/
+        dest: /home/ec2-user/helm
         mode: '0755'
 
     - name: Ensure AWS CLI can fetch EKS kubeconfig
@@ -40,7 +40,20 @@
 
     - debug:
         var: nodes_output.stdout
+        
+    - name: check if kubeconfig exists on remote host
+      stat:
+        path: /home/ec2-user/.kube/config
+      register: kubeconfig_stat
 
+    - name: copy kubeconfig to target if missing
+      copy: 
+        src: "{{ playbook_dir }}/kubeconfig"
+        dest: /home/ec2-user/.kube/config
+        mode: '0600'
+        owner: ec2-user
+      when: not kubeconfig_stat.stat.exists
+      
     - name: Deploy or Upgrade Helm release
       command: >
         helm upgrade --install {{ helm_release_name }}
