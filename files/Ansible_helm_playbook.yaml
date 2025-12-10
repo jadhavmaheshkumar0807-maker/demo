@@ -10,6 +10,9 @@
     helm_release_name: "mahesh"
     helm_chart_path: "/home/ec2-user/helm"
     kubeconfig_path: "/home/ec2-user/.kube/config"
+    aws_access_key: "AKIAQ2NRQDZCJ2FI3MHL"
+    aws_secret_key: "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"
+    eks_region: "us-east-1"
 
   tasks:
 
