@@ -1,6 +1,6 @@
 Deployment:
   replicaCount: 2
-  imageVersion: ${BUILD_NUMBER}
+  imageVersion:13
 
 service:
   port: 5430
