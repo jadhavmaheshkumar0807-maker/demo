@@ -8,10 +8,16 @@
     eks_cluster_name: "chinna"
     eks_region: "us-east-1"
     helm_release_name: "mahesh"
-    helm_chart_path: "./helm"
-    kubeconfig_path: "~/.kube/config"
+    helm_chart_path: "/home/ec2-user/helm"
+    kubeconfig_path: "/home/ec2-user/.kube/config"
 
   tasks:
+
+    - name: Copy Helm chart directory
+      copy:
+        src: "{{ playbook_dir }}/helm"
+        dest: /home/ec2-user/
+        mode: '0755'
 
     - name: Ensure AWS CLI can fetch EKS kubeconfig
       command: >
@@ -19,25 +25,21 @@
         --name {{ eks_cluster_name }}
         --region {{ eks_region }}
         --kubeconfig {{ kubeconfig_path }}
+      environment:
+        AWS_ACCESS_KEY_ID: "{{ aws_access_key }}"
+        AWS_SECRET_ACCESS_KEY: "{{ aws_secret_key }}"
+        AWS_DEFAULT_REGION: "{{ eks_region }}"
       register: kubeconfig_output
 
-    - name: Show kubeconfig result
-      debug:
+    - debug:
         var: kubeconfig_output.stdout
 
     - name: Verify kubectl connection to EKS
       command: kubectl --kubeconfig {{ kubeconfig_path }} get nodes
       register: nodes_output
 
-    - name: Show node list
-      debug:
+    - debug:
         var: nodes_output.stdout
-
-    - name: copy k8s deployment files to app server
-      copy:
-        src: "{{ playbook_dir }}/Ansible_helm_playbook.yaml"
-        dest: /home/ec2-user/Ansible_helm_playbook.yaml
-        mode: '0644'
 
     - name: Deploy or Upgrade Helm release
       command: >
@@ -46,6 +48,5 @@
         --kubeconfig {{ kubeconfig_path }}
       register: helm_output
 
-    - name: Show Helm output
-      debug:
+    - debug:
         var: helm_output.stdout
