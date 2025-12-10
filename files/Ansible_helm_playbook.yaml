@@ -8,7 +8,7 @@
     eks_cluster_name: "mahesh"
     eks_region: "us-east-1"
     helm_release_name: "mahesh"
-    helm_chart_path: "/home/ec2-user/helm"
+    helm_chart_path: "/home/ec2-user/"
     kubeconfig_path: "/home/ec2-user/.kube/config"
 
     # Values passed securely from Jenkins
