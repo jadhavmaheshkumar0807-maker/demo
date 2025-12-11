@@ -23,7 +23,7 @@ spec:
         - name: mahesh-cnt
           image: maheshkumar010/mahesh:{{ .Values.Deployment.imageVersion }}
           ports:
-            - containerPort: {{ .Values.service.port }}
+            - containerPort: 5430
           resources:
             requests:
               cpu: "300m"
@@ -31,14 +31,14 @@ spec:
           livenessProbe:
             httpGet:
               path: /
-              port: {{ .Values.service.port }}
+              port: 5430
             initialDelaySeconds: 5
             periodSeconds: 10
             failureThreshold: 3
           readinessProbe:
             httpGet:
               path: /
-              port: {{ .Values.service.port }}
+              port: 5430
             initialDelaySeconds: 5
             periodSeconds: 10
             failureThreshold: 3
