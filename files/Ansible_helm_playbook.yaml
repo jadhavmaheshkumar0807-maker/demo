@@ -65,8 +65,9 @@
 
     - name: Deploy / Upgrade Helm release on EKS
       command: >
-        helm install {{ helm_release_name }}
+        helm upgrade --install {{ helm_release_name }}
         {{ helm_chart_path }}
+        --kubeconfig {{ kubeconfig_path }}
       environment:
         AWS_ACCESS_KEY_ID: "{{ aws_access_key }}"
         AWS_SECRET_ACCESS_KEY: "{{ aws_secret_key }}"
