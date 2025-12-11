@@ -10,7 +10,7 @@ spec:
   selector:
     matchLabels:
       app: nodejs-springboot
-  replicas: {{ .Values.Deployment.replicaCount }}
+  replicas: 2
   template:
     metadata:
       name: mahesh-pod
@@ -21,7 +21,7 @@ spec:
     spec:
       containers:
         - name: mahesh-cnt
-          image: maheshkumar010/mahesh:{{ .Values.Deployment.imageVersion }}
+          image: maheshkumar010/mahesh:latest
           ports:
             - containerPort: 5430
           resources:
