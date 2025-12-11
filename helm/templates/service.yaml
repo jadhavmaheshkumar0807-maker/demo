@@ -7,10 +7,10 @@ metadata:
     app: mahesh-app
     env: qa
 spec:
-  type: {{ .Values.service.type }}
+  type: LoadBalancer
   ports:
-    - port: {{ .Values.service.port }}
-      targetPort: {{ .Values.service.port }}
+    - port: 5430
+      targetPort: 5430
       protocol: TCP
   selector:
     app: mahesh-app
