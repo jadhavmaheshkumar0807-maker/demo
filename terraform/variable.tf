@@ -29,7 +29,7 @@ variable "availability_zone" {
 
 variable "instance_type" {
     description = "type of the instance"
-    default = "m7i-flex.large"
+    default = "c7i-flex.large"
     type = string  
 }
 
