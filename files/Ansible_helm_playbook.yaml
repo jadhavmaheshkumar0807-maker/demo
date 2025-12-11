@@ -35,18 +35,7 @@
         AWS_SECRET_ACCESS_KEY: "{{ aws_secret_key }}"
         AWS_DEFAULT_REGION: "{{ eks_region }}"
       register: kubeconfig_output
-    - name: check if kubeconfig exists on remote host
-      stat:
-        path: /home/ec2-user/.kube/config
-      register: kubeconfig_stat
-
-    - name: copy kubeconfig to target if missing
-      copy: 
-        src: "{{ playbook_dir }}/kubeconfig"
-        dest: /home/ec2-user/.kube/config
-        mode: '0600'
-        owner: ec2-user
-      when: not kubeconfig_stat.stat.exists
+  
     - name: Show kubeconfig update result
       debug:
         var: kubeconfig_output.stdout
