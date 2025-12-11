@@ -24,10 +24,7 @@ spec:
           image: maheshkumar010/mahesh:latest
           ports:
             - containerPort: 5430
-          resources:
-            requests:
-              cpu: "300m"
-              memory: "512Mi"
+          
           livenessProbe:
             httpGet:
               path: /
