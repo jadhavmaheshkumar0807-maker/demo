@@ -4,6 +4,5 @@ Deployment:
 
 service:
   port: 5430
-
-type: LoadBalancer
+  type: LoadBalancer
 
