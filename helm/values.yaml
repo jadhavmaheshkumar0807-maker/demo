@@ -1,4 +1,1 @@
-Deployment:
-  replicaCount: 2
-  imageVersion:${BUILD_NUMBER}
-  
+
