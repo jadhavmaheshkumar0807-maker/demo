@@ -19,8 +19,8 @@ pipeline {
                 sh '''
                     cd mahesh-app
                     mvn sonar:sonar \
-                      -Dsonar.host.url=http://3.238.243.178:9000 \
-                      -Dsonar.login=squ_6461ae01dd3ed131326485ed3981daf6c5990c35
+                      -Dsonar.host.url=http://3.231.33.88:9000/ \
+                      -Dsonar.login=squ_a5f2c6b5bec5dc7e158192870f21233ef6f515bc
                 '''
             }
         }
