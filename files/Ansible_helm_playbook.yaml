@@ -21,7 +21,7 @@
       copy:
         src: "{{ playbook_dir }}/../helm"
         dest: /home/ec2-user/.
-        mode: '0644'
+        mode: '0744'
       tags: copy
 
     - name: Ensure AWS CLI updates kubeconfig for EKS
