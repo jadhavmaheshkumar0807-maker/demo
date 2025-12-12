@@ -21,7 +21,7 @@ spec:
     spec:
       containers:
         - name: mahesh-cnt
-          image: maheshkumar010/mahesh:9
+          image: maheshkumar010/mahesh:10
           ports:
             - containerPort: 5430
           
