@@ -29,13 +29,13 @@ spec:
             httpGet:
               path: /
               port: 5430
-            initialDelaySeconds: 5
+            initialDelaySeconds: 30
             periodSeconds: 10
-            failureThreshold: 3
+            failureThreshold: 5
           readinessProbe:
             httpGet:
               path: /
               port: 5430
-            initialDelaySeconds: 5
+            initialDelaySeconds: 20
             periodSeconds: 10
-            failureThreshold: 3
+            failureThreshold: 5
