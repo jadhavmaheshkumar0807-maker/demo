@@ -1,7 +1,5 @@
-FROM eclipse-temurin:8-jre-alpine
+FROM eclipse-temurin:17-jre-alpine
 
-# Create a non-root user and group
-RUN addgroup -S appgroup && adduser -S appuser -G appgroup
 
 # Set working directory
 WORKDIR /app
@@ -9,14 +7,9 @@ WORKDIR /app
 # Copy JAR file
 COPY target/*.jar app.jar
 
-# Change ownership so non-root user can access files
-RUN chown -R appuser:appgroup /app
-
 # Expose application port
-EXPOSE 8080
+EXPOSE 5430
 
-# Switch to non-root user
-USER appuser
 
 # Run your application
-ENTRYPOINT ["java", "-jar", "app.jar"]
+ENTRYPOINT ["sh", "-c", "java $JAVA_OPTS -jar app.jar"]
