@@ -1,15 +1,23 @@
-FROM eclipse-temurin:17-jre-alpine
+# Lightweight Java 8 runtime (Alpine)
+FROM amazoncorretto:8-alpine
 
+# Create non-root user for security
+RUN addgroup -S app && adduser -S app -G app
 
 # Set working directory
 WORKDIR /app
 
-# Copy JAR file
+# Copy JAR
 COPY target/*.jar app.jar
+
+# Set ownership
+RUN chown -R app:app /app
+
+# Switch to non-root user
+USER app
 
 # Expose application port
 EXPOSE 5430
 
-
-# Run your application
+# Run application with JAVA_OPTS support
 ENTRYPOINT ["sh", "-c", "java $JAVA_OPTS -jar app.jar"]
