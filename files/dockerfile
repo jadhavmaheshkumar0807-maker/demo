@@ -20,4 +20,5 @@ USER app
 EXPOSE 5430
 
 # Run application with JAVA_OPTS support
-ENTRYPOINT ["sh", "-c", "java $JAVA_OPTS -jar app.jar"]
+CMD ["java", "-version"]
+
