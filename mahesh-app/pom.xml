@@ -51,8 +51,8 @@
 
               <dependency>
                      <groupId>org.springframework.boot</groupId>
-                     <artifactId>spring-boot-starter-actuator</artifactId>
-                     <scope>3.2.0</scope>
+                     <artifactId>spring-boot-starter-test</artifactId>
+                     <scope>test</scope>
              </dependency>
 		        
               <dependency>
