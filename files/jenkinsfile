@@ -59,7 +59,7 @@ pipeline {
                         git config user.name "Mahesh Kumar"
                         git config user.email "maheshkumar@gmail.com"
 
-                        sed -i 's|mahesh:.*|imageVersion:${BUILD_NUMBER}|g' helm/templates/deployment.yaml
+                        sed -i 's|mahesh:.*|mahesh:${BUILD_NUMBER}|g' helm/templates/deployment.yaml
 
 
                         git add .
