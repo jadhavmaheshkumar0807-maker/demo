@@ -5,7 +5,7 @@
   become: true
 
   vars:
-    eks_cluster_name: "lakhan"
+    eks_cluster_name: "qa"
     eks_region: "us-east-1"
     helm_release_name: "mahesh"
     helm_chart_path: "/home/ec2-user/helm/"
